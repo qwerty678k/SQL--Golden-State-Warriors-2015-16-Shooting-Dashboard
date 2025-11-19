@@ -1,67 +1,66 @@
-/*
- * PORTFOLIO PROJECT: 2015-16 Team Performance Dashboard
- * GOAL: Analyze individual performance trends, establish a team hierarchy, 
- * and provide contextual benchmarks for every record.
- */
+================================================================================
+PROJECT TITLE: 2015-16 Golden State Warriors Performance Dashboard
+AUTHOR: [Your Name]
+DATE: [Current Date]
+================================================================================
 
-WITH GSW_Shooting_Stats AS (
-  SELECT
-    player,
-    game_id,
-    "3P",
-    /* * METRIC CALCULATION: 
-     * Calculate the season-long baseline (average) for each individual.
-     * This allows us to compare daily performance against their standard level.
-     */
-    AVG("3P") OVER (PARTITION BY player) AS Avg_3P
-  FROM
-    Player_Stats
-  WHERE
-    team = 'GSW' -- Focus on the Golden State Warriors organization
-    AND SUBSTR(game_id, 1, 4) = '1516' -- Filter for the 2015-2016 fiscal year/season
-)
+[ OVERVIEW ]
+This repository contains an advanced SQL project designed to audit and visualize 
+team performance stability. Using data from the historic 2015-2016 NBA season, 
+this project simulates a business intelligence request to analyze individual 
+contributor trends, establish team hierarchies, and provide contextual 
+benchmarking for performance reviews.
 
-SELECT
-  player,
-  game_id,
-  "3P",
-  Avg_3P,
-  /* * CHRONOLOGICAL SEQUENCING:
-   * Assign a unique ID to each event (game) in chronological order.
-   * This is essential for identifying streaks or time-based patterns.
-   */
-  ROW_NUMBER() OVER (PARTITION BY player ORDER BY game_id ASC) AS Game_Seq,
-  
-  /* * TREND ANALYSIS:
-   * Fetch values from the previous event (LAG) and the subsequent event (LEAD).
-   * This allows us to visualize month-over-month or game-over-game volatility.
-   */
-  LAG("3P") OVER (PARTITION BY player ORDER BY game_id ASC) AS Prev_Game_3P,
-  LEAD("3P") OVER (PARTITION BY player ORDER BY game_id ASC) AS Next_Game_3P,
-  
-  /* * HIERARCHY ESTABLISHMENT:
-   * Rank all individuals based on their overall season performance.
-   * DENSE_RANK ensures that ties share the same rank and no rank numbers are skipped.
-   */
-  DENSE_RANK() OVER (ORDER BY Avg_3P DESC) AS Team_Rank,
-  
-  /* * CONTEXTUAL BENCHMARKING:
-   * Dynamically populate every row with the top performer (FIRST_VALUE) 
-   * and lowest performer (LAST_VALUE) in the group.
-   * This allows instant comparison of any individual against the group's ceiling and floor.
-   */
-  FIRST_VALUE(player) OVER (
-    ORDER BY Avg_3P DESC
-  ) AS Top_Shooter,
-  
-  LAST_VALUE(player) OVER (
-    ORDER BY Avg_3P DESC
-    -- Define the window to look at the entire dataset to find the true last value
-    RANGE BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
-  ) AS Low_Shooter
+[ BUSINESS PROBLEM ]
+A stakeholder (The Coaching Staff) requested a "Shooting Stability Report" to 
+better understand player consistency. Standard aggregate metrics (like season 
+averages) hide volatility. The stakeholder needed a view that could answer:
+1. Trend Analysis: Is a player's performance trending up or down compared to 
+   previous events?
+2. Hierarchy: Where does this player rank within the organization?
+3. Context: For every game log, how far is this player from the team's 
+   best and worst performers?
 
-FROM
-  GSW_Shooting_Stats
-ORDER BY
-  Team_Rank ASC,
-  Game_Seq ASC;
+[ DATA SOURCE ]
+The analysis utilizes a raw dataset (`player_stats.csv`) containing game-by-game 
+logs for NBA players.
+- Key Filters Applied: Team (Golden State Warriors), Season (2015-2016).
+- Key Metrics Analyzed: 3-Point Field Goals Made ("3P").
+
+[ TECHNICAL SKILLS DEMONSTRATED ]
+This project moves beyond basic data retrieval to perform complex analytical 
+transformations. Key SQL concepts include:
+
+1. Common Table Expressions (CTEs): 
+   Used to pre-calculate season-long baselines and clean the dataset before 
+   ranking logic is applied.
+
+2. Advanced Window Functions:
+   - Chronological Sequencing: Using ROW_NUMBER() to create time-series 
+     identifiers.
+   - Trend Analysis: Using LAG() and LEAD() to fetch values from previous and 
+     subsequent rows, enabling "period-over-period" analysis without self-joins.
+   - Ranking Logic: Using DENSE_RANK() to handle ties in performance data 
+     appropriately.
+
+3. Absolute Fetching & Benchmarking:
+   - Using FIRST_VALUE() and LAST_VALUE() to dynamically populate every row 
+     with the team's "Ceiling" (Top Performer) and "Floor" (Lowest Performer) 
+     for immediate contextual comparison.
+
+[ PROJECT FILES ]
+- `analysis_query.sql`: The complete SQL script containing the logic described above.
+- `player_stats.csv`: The source dataset used for the query.
+- `README.txt`: Project documentation.
+
+[ HOW TO INTERPRET THE OUTPUT ]
+The query generates a table where each row represents a single game for a player. 
+However, unlike a standard box score, this output includes:
+- `Game_Seq`: The chronological order of the game for that specific player.
+- `Prev_Game_3P` / `Next_Game_3P`: Performance context from surrounding games.
+- `Team_Rank`: The player's standing in the team hierarchy based on season averages.
+- `Top_Shooter` / `Low_Shooter`: The names of the benchmarks used for comparison.
+
+[ CONTACT ]
+For questions regarding the query logic or methodology, please contact me via 
+profile details provided in this repository.
