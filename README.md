@@ -1,7 +1,5 @@
 ================================================================================
 PROJECT TITLE: 2015-16 Golden State Warriors Performance Dashboard
-AUTHOR: [Your Name]
-DATE: [Current Date]
 ================================================================================
 
 [ OVERVIEW ]
@@ -60,7 +58,3 @@ However, unlike a standard box score, this output includes:
 - `Prev_Game_3P` / `Next_Game_3P`: Performance context from surrounding games.
 - `Team_Rank`: The player's standing in the team hierarchy based on season averages.
 - `Top_Shooter` / `Low_Shooter`: The names of the benchmarks used for comparison.
-
-[ CONTACT ]
-For questions regarding the query logic or methodology, please contact me via 
-profile details provided in this repository.
