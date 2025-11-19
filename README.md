@@ -47,9 +47,9 @@ transformations. Key SQL concepts include:
      for immediate contextual comparison.
 
 [ PROJECT FILES ]
-- `analysis_query.sql`: The complete SQL script containing the logic described above.
+- `Warriors_2015-16_Performance_Dashboard`: The complete SQL script containing the logic described above.
 - `player_stats.csv`: The source dataset used for the query.
-- `README.txt`: Project documentation.
+- `README.md`: Project documentation.
 
 [ HOW TO INTERPRET THE OUTPUT ]
 The query generates a table where each row represents a single game for a player. 
